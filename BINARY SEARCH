@@ -1,1 +1,21 @@
-ITS BEST IF THE ELEMENTS IS IN SORTED ORDER
+//WE BASICALLY NARROW DOWN CHOICES.FOR EG REDUCE A SEARCH FROM 1 TO 100 IN 2 HALFS OR SMALLER SO THAT CHANCES ARE HIGH AND WE CAN ELIMINATE UNWANTED DATA
+//ITS BEST IF THE ELEMENTS IS IN SORTED ORDER// OTHERWISE WE HAVE TO LOOK INDIVIDUALLY IE O(n)
+
+int binarysearch(arr,target) {
+L,R = 0,len(arr)-1
+
+while L<=R {
+mid= (L+R)//2
+
+if target>arr[mid]
+L= mid+1
+else if target<arr[mid]
+R=mid-1
+else
+return mid
+}
+return -1
+}
+
+BASICALLY time complexity or THE WORST CASE EXECUTION TIME IS O(LOG n).
+memory complexity is O(1) because we are not allocating any memory lile arrays. we just used some pointers
