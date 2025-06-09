@@ -1,0 +1,80 @@
+Breadth First Search
+In depth-first search, we prioritized depth. For breath-first search (BFS), we prioritize breadth, meaning we focus on visiting all the nodes on one level before moving on to the next level.
+
+BFS is also known as level-order traversal when referring to trees, since we visit the nodes level by level.
+
+Implementation
+
+Generally, breadth-first search is implemented iteratively and that is the implementation we will be covering in this course.
+
+Since we want to visit all the nodes on one level before moving to the next, we will need a data structure that allows us to do this.
+
+A queue data structure, more specifically, a deque, allows us to remove elements both from the head and the tail in 
+O
+(
+1
+)
+O(1) time. For BFS we will append elements to the tail and remove elements from the head as we go through each level of the tree from left to right.
+
+void bfs(TreeNode* root) {
+    queue<TreeNode*> queue;
+
+    if (root) {
+        queue.push(root);
+    }
+    
+    int level = 0;
+    while (queue.size() > 0) {
+        cout << "level: " << level << endl;
+        int length = queue.size();
+        for (int i = 0; i < length; i++) {
+            TreeNode* curr = queue.front();
+            queue.pop();
+            cout << curr->val_ << ' ';
+            if (curr->left) {
+                queue.push(curr->left);
+            }
+            if (curr->right) {
+                queue.push(curr->right);
+            }
+        }
+        level++;
+        cout << endl;
+    }
+}
+Initially, we append the root node to our queue.
+We then enter a while loop that runs as long as our queue is not empty.
+We print the level we are currently on.
+We loop through the queue and remove nodes in the current level.
+If the node has children, we append them to the queue from left to right.
+After the current level is done, we increment the level by 1.
+Our queue becomes empty once we have visited all of the nodes and the outer while loop will terminate.
+The visual below demonstrates what the state of the queue at every level of the tree would look like.
+
+bfs
+
+Time and Space Complexity
+Time
+The time complexity of BFS is 
+O
+(
+n
+)
+O(n) where 
+n
+n is the number of nodes in the tree. This is because we visit every node exactly once.
+
+Space
+The space complexity of BFS is 
+O
+(
+n
+)
+O(n) where 
+n
+n is the number of nodes in the tree. This is because we will store an entire level of the tree in the queue at a time. In the worst case the last level may be roughly half the size of the tree, so the space complexity is 
+O
+(
+n
+)
+O(n).
