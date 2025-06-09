@@ -1,0 +1,3 @@
+insertion sort - stable - wcet - O(n^2)
+merge sort -stab;e -O(n logn)
+qucik sort --gen not stable -O(n log n)  //wcet -O(n^2)
