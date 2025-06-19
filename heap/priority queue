@@ -1,0 +1,157 @@
+
+draw them as binary tress- we dont start at index 0
+A heap is a specialized, tree-based data structure.
+
+It implements an abstract data type called the Priority Queue, but sometimes 'Heap' and 'Priority Queue' are used interchangeably.
+We already learned that queues operate with a first-in-first-out basis but with a priority queue, the values are removed based on a specific priority. The element with the highest priority is removed first, regardless of the order in which it was added.
+
+Two types of heaps
+Min Heap
+Max Heap
+
+Min heaps have the smallest value at the root node. The smallest value has the highest priority to be removed.
+Max heaps have the largest value at the root node. The largest value has the highest priority to be removed.
+In this lesson, we will be focusing on min heaps, but the implementation is exactly the same for max heap, except you would prioritize the maximum value instead of the minimum.
+
+Heap Properties
+For a binary tree to qualify as a heap, it must satisfy the following properties:
+
+1. Structure Property
+A binary heap is a binary tree that is a complete binary tree, where every single level of the tree is filled completely, except possibly the lowest level nodes, which are filled contiguously from left to right
+
+2. Order Property
+
+The order property for a min-heap is that all of the descendents should be greater than their ancestors. In other words, if we have a root with value y, every node in the right and the left sub-tree should have values greater than or equal to y. This is a recursive property, similar to binary search trees.
+
+In a max-heap, every node in the right and the left sub-tree is smaller than or equal to y
+
+Unlike binary search trees, heaps may contain duplicate values.
+Binary heaps are drawn using a tree data structure but under the hood, they are implemented using arrays. Let's show how we can do this by using the given binary heap: [14,19,16,21,26,19,68,65,30,null,null,null,null,null,null]
+
+We will take an array of size N.
+
+The reason why we start filling up our array from index 1 is because it helps us figure out the index at which a node's left child, right child, or the parent resides. Because binary heaps are complete binary trees, no space is required for pointers. Instead, a node's left child, right child, and parent can be calculated using the following formulas, where `i` is the index of a given node:
+
+leftChild = 2 * i  
+rightChild = 2 * i + 1  
+parent = i / 2
+
+
+Heaps Push and Pop
+With heaps we can read the minimum or maximum value in constant time, 
+O(1) by simply reading the element at the first position.
+
+However, pushing and popping from a heap is more complicated, but can still be accomplished efficiently with a time complexity of 
+O(log n).
+
+Taking the same binary heap from before: [14,19,16,21,26,19,68,65,30,null,null,null,null,null,null], let's say we wish to push 17. We also need to make sure that we maintain our structure and order property.
+
+Since a binary heap is a complete binary tree, and we are required to fill nodes in a contigious fashion, pushing 17 should happen at the 
+10
+10th index. However, this might violate the min heap property.
+
+This can be resolved by bubbling or percolating the element up the tree until it reaches the correct position.
+
+We start by comparing 17 with its parent, which is 26.
+We must ensure that all the descentants of every node are greater than the node itself. Since 17 is less than 26, we swap the two.
+We then compare 17 with its new parent, which is 19.
+Since 17 is less than 19, we swap the two.
+Lastly, we compare 17 with its new parent, which is 14.
+Since 17 is greater than 14, we stop the percolation (also known as bubbling or shifting) process.
+
+void push(int val) {
+    heap_.push_back(val);
+    int i = heap_.size() - 1;
+
+    // Percolate up
+    while (i > 1 && heap_[i] < heap_[i / 2]) {
+        int tmp = heap_[i];
+        heap_[i] = heap_[i / 2];
+        heap_[i / 2] = tmp;
+        i = i / 2;
+    }
+}
+
+
+Pop
+Recall that when we pop from a heap, we are removing the value with the highest priority.
+
+The obvious way
+Popping from a heap is more complicated than the push operation. One way that you might have already thought about is pop the root node and replace it with min(left_child, right_child). The issue here is that while the order property is intact, we have violated the structure property. Taking the tree from before, popping 14, and swapping it with 16 - min(left_child, right_child) would require 19 to replace 16. Now, level 
+2
+2 has a missing node i.e 19 is missing a left child.
+
+The correct solution is very clever.
+
+We read the root element since it is the element we wish to pop.
+Next, we take the right-most node of the last level and swap it with the root node.
+We have now maintained the structure property, but the order property is violated.
+To fix the order property, we have to make sure that 30 finds its place.
+To do so, we will continously swap 30 with min(left_child, right_child) until it reaches the correct position, i.e. both of it's children are greater than or equal to 30.
+We swap 30 with 16, then 19 with 30.
+
+int pop() {
+    if (heap_.size() == 1) {
+        // Normally we would throw an exception if heap is empty.
+        return -1;
+    }
+    if (heap_.size() == 2) {
+        int res = heap_[heap_.size() - 1];
+        heap_.pop_back();
+        return res;
+    }
+
+    int res = heap_[1];
+    // Move last value to root
+    heap_[1] = heap_[heap_.size() - 1];
+    heap_.pop_back();
+    int i = 1;
+    // Percolate down
+    while (2 * i < heap_.size()) {
+        if (2 * i + 1 < heap_.size() && 
+        heap_[2 * i + 1] < heap_[2 * i] &&
+        heap_[i] > heap_[2 * i + 1]) {
+            // Swap right child
+            int tmp = heap_[i];
+            heap_[i] = heap_[2 * i + 1];
+            heap_[2 * i + 1] = tmp;
+            i = 2 * i + 1;
+        } else if (heap_[i] > heap_[2 * i]) {
+            // Swap left child
+            int tmp = heap_[i];
+            heap_[i] = heap_[2 * i];
+            heap_[2 * i] = tmp;
+            i = 2 * i;
+        } else {
+            break;
+        }
+    }
+    return res;
+}
+
+The pseudocode shown above might seem daunting at first so let's go over it. If our heap is empty, there is nothing to pop, hence the return null. Our heap also could have just one node, in which case, we will just pop that node and don't need to make any adjustments. If the above two statements have not executed, it must be the case that we have children, meaning we need to perform a swap.
+
+We store our 14 into a variable called res so that we don't lose it. Then we can replace 30 to be at the root node.
+
+Our while loop runs as long as we have a left child and we determine this by making sure 2 * i is not out of bounds. Then, there are three cases we concern ourselves with:
+
+The node has no children
+The node only has a left child
+The node has two children
+When considering a binary heap, it is not possible to have only a right child because then it no longer is a complete binary tree and violates the structure property.
+Because we are guaranteed to have a left child in the while loop, we need to now check if the node also has a right child, which we check by 2 * i + 1. We also make sure that the current node is greater than its children because of the order property. We replace the node with the minimum of its two children.
+
+If no right child exists and the current node's value is greater than its left child, we swap it with the left child.
+
+If none of the above cases exectue, then it must be the case that our node is in the proper position already, satisfying both the order and the structural property
+
+Closing Notes
+The time complexity of the operations discussed so far can be summarized by the following table.
+
+Operation	Big-O Time
+Get Min/Max	
+O(1)
+Push	
+O(log n)
+Pop	
+O(log n)
